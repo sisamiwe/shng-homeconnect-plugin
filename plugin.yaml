@@ -1,0 +1,538 @@
+# Metadata for the plugin
+plugin:
+    # Global plugin attributes
+    type: gateway                   # plugin type (gateway, interface, protocol, system, web)
+    description:
+        de: 'HomeConnect lokal'
+        en: 'HomeConnect local'
+    maintainer: sisamiwe
+#    tester:                         # Who tests this plugin?
+    state: develop                  # Initial 'develop'. change to 'ready' when done with development
+#    keywords: iot xyz
+#    documentation: ''              # An url to optional plugin doc - NOT the url to user_doc!!!
+#    support: https://knx-user-forum.de/forum/supportforen/smarthome-py
+
+    version: 1.0.0                  # Plugin version (must match the version specified in __init__.py)
+
+    # these min/max-versions MUST be given in quotes, or e.g. 3.10 will be interpreted as 3.1 (3.1 < 3.9 < 3.10)
+    sh_minversion: '1.10'           # minimum shNG version to use this plugin
+#    sh_maxversion: '1.11'          # maximum shNG version to use this plugin (omit if latest)
+#    py_minversion: '3.10'          # minimum Python version to use for this plugin
+#    py_maxversion: '4.25'          # maximum Python version to use for this plugin (omit if latest)
+
+    multi_instance: false           # plugin supports multi instance
+    restartable: unknown            # plugin supports stopping and starting again, must be implemented
+    classname: HomeConnect         # class containing the plugin
+
+parameters:
+    # Definition of parameters to be configured in etc/plugin.yaml (enter 'parameters: NONE', if section should be empty)
+
+    pause_item:
+        type: str
+        default: ''
+        description:
+            de: 'Item, um die Ausführung des Plugins zu steuern'
+            en: 'item for controlling plugin execution'
+
+    device_name:
+        mandatory: true
+        type: str
+        default: ''
+        description:
+            de: 'Gerätename'
+            en: 'device name'
+
+    cycle:
+        type: int
+        default: 60
+        description:
+            de: 'Zykluszeit für Geräteabfrage'
+            en: 'Cycle time for device polling'
+
+item_attributes:
+    hcl_device:
+        type: str
+        description:
+            de: 'Gerätename'
+            en: ''
+
+    hcl_status_info:
+        type: str
+        description:
+            de: 'Statusinformation (entspricht Key des Device_info Dictionary)'
+            en: 'status info keyword  (equals Key des Device_info Dictionary)'
+
+    hcl_device_info:
+        type: str
+        description:
+            de: 'Geräteinformation (entspricht Key des Device_info Dictionary)'
+            en: 'device info keyword  (equals Key des Device_info Dictionary)'
+
+    hcl_interface_info:
+        type: str
+        description:
+            de: 'Interfaceinformation (entspricht Key des Device_info Dictionary)'
+            en: 'interface info keyword  (equals Key des Device_info Dictionary)'
+
+item_structs:
+    device:
+        device_id:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: deviceID
+
+        brand:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: brand
+
+        model_number:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: eNumber
+
+        vib:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: vib
+
+        mac:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: mac
+
+        ha_version:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: haVersion
+
+        sw_version:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: swVersion
+
+        hw_version:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: hwVersion
+
+        device_type:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: deviceType
+
+        device_info:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: deviceInfo
+
+        customer_index:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: customerIndex
+
+        serial_number:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: serialNumber
+
+        fd_string:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: fdString
+
+        ship_ski:
+            type: str
+            hcl_device: ..:.
+            hcl_device_info: shipSki
+
+    interface:
+        interface_id:
+            type: num
+            hcl_device: ..:.
+            hcl_interface_info: interfaceID
+
+        interface_type:
+            type: str
+            hcl_device: ..:.
+            hcl_interface_info: type
+
+        ssid:
+            type: str
+            hcl_device: ..:.
+            hcl_interface_info: ssid
+
+        rssi:
+            type: num
+            hcl_device: ..:.
+            hcl_interface_info: rssi
+
+        primary:
+            type: bool
+            hcl_device: ..:.
+            hcl_interface_info: primary
+
+        status:
+            type: str
+            hcl_device: ..:.
+            hcl_interface_info: status
+
+        configured:
+            type: bool
+            hcl_device: ..:.
+            hcl_interface_info: configured
+
+        eui_address:
+            type: str
+            hcl_device: ..:.
+            hcl_interface_info: euiAddress
+
+        ip_address:
+            type: str
+            hcl_device: ..:.
+            hcl_interface_info: ipV4.ipAddress
+
+        prefix_size:
+            type: num
+            hcl_device: ..:.
+            hcl_interface_info: ipV4.prefixSize
+
+        gateway:
+            type: str
+            hcl_device: ..:.
+            hcl_interface_info: ipV4.gateway
+
+        dns_server:
+            type: str
+            hcl_device: ..:.
+            hcl_interface_info: ipV4.dnsServer
+
+    status_common_event:
+        aquastop_occurred:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.aquastopoccured
+
+        confirm_permanent_remotestart:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.confirmpermanentremotestart
+
+        connect_local_wifi:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.connectlocalwifi
+
+        low_water_pressure:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.lowwaterpressure
+
+        program_aborted:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.programaborted
+
+        program_finished:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.programfinished
+
+        software_download_available:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.softwaredownloadavailable
+
+        software_update_available:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.softwareupdateavailable
+
+        software_update_successful:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.event.softwareupdatesuccessful
+
+    status_common_option:
+        energy_forecast:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.option.energyforecast
+
+        program_progress:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.option.programprogress
+
+        remaining_program_time:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.option.remainingprogramtime
+
+        remaining_program_time_is_estimated:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.option.remainingprogramtimeisestimated
+
+        start_in_relative:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.option.startinrelative
+
+        water_forecast:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.option.waterforecast
+
+    status_common_root:
+        active_program:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: common.root.activeprogram
+
+        selected_program:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: common.root.selectedprogram
+
+    status_common_setting:
+        allow_backend_connection:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.setting.allowbackendconnection
+
+        favorite_001:
+            type: dict
+            hcl_device: ..:.
+            hcl_status_info: common.setting.favorite.001
+
+    status_common_latest:
+        counter:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.status.ProgramSessionSummary.Latest.counter
+
+        program:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: common.status.ProgramSessionSummary.Latest.program
+
+        start:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: common.status.ProgramSessionSummary.Latest.start
+
+        end:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: common.status.ProgramSessionSummary.Latest.end
+
+    status_common_current:
+        backend_connected:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.status.backendconnected
+
+        door_state:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: common.status.doorstate
+
+        error_codes_list:
+            type: dict
+            hcl_device: ..:.
+            hcl_status_info: common.status.errorcodeslist
+
+        interior_illumination_active:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: common.status.interiorilluminationactive
+
+        operation_state:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: common.status.operationstate
+
+        counter:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.status.program.all.count.started
+
+        program_run_detail:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: common.status.programrundetail.endtrigger
+
+    status_dishwasher_event:
+        check_filtersystem:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.checkfiltersystem
+
+        draining_not_possible:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.drainingnotpossible
+
+        drain_pump_blocked:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.drainpumpblocked
+
+        internal_error:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.internalerror
+
+        low_voltage:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.lowvoltage
+
+        machine_care_and_filter_cleaning_reminder:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.machinecareandfiltercleaningreminder
+
+        machine_care_reminder:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.machinecarereminder
+
+        rinse_aid_lack:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.rinseaidlack
+
+        rinse_aid_nearly_empty:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.rinseaidnearlyempty
+
+        salt_lack:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.saltlack
+
+        salt_nearly_empty:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.saltnearlyempty
+
+        smart_filter_cleaning_reminder:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.smartfiltercleaningreminder
+
+        water_heater_calcified:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.event.waterheatercalcified
+
+    status_dishwasher_option:
+        brilliance_dry:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.option.brilliancedry
+
+        hygiene_plus:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.option.hygieneplus
+
+        intensiv_zone:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.option.intensivzone
+
+        silence_ondemand:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.option.silenceondemand
+
+        variospeed_plus:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.option.variospeedplus
+
+    status_dishwasher_setting:
+        eco_as_default:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.ecoasdefault
+
+        extra_dry:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.extradry
+
+        hotwater:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.hotwater
+
+        interior_light:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.interiorlight
+
+        interior_light_mode:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.interiorlightmode
+
+        rinse_aid:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.rinseaid
+
+        sensitivity_turbidity:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.sensitivityturbidity
+
+        silence_ondemand_default_time:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.silenceondemanddefaulttime
+
+        soundlevel_key:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.soundlevelkey
+
+        soundlevel_signal:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.soundlevelsignal
+
+        speed_ondemand:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.speedondemand
+
+        time_light:
+            type: bool
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.timelight
+
+        water_hardness:
+            type: str
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.setting.waterhardness
+
+    status_dishwasher_status:
+        silence_ondemand_remaining_time:
+            type: num
+            hcl_device: ..:.
+            hcl_status_info: dishwasher.status.silenceondemandremainingtime
+
+#item_attribute_prefixes:
+    # Definition of item attributes that only have a common prefix (enter 'item_attribute_prefixes: NONE' or ommit this section, if section should be empty)
+    # NOTE: This section should only be used, if really nessesary (e.g. for the stateengine plugin)
+
+plugin_functions: NONE
+    # Definition of plugin functions defined by this plugin (enter 'plugin_functions: NONE', if section should be empty)
+
+logic_parameters: NONE
+    # Definition of logic parameters defined by this plugin (enter 'logic_parameters: NONE', if section should be empty)
