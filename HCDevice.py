@@ -99,9 +99,6 @@ class HCDevice:
     def parse_values_new(self, values):
         """Parsed the value of the received message and returns data structured in nested dict with uid name as keys"""
 
-        # ToDo: remaining_program_time: filter string nur int werte, string filtern
-        # ToDo: remaining_program_time: filter string nur int werte, string filtern
-
         def _decode_list_of_uids(uid_value_pair_list):
             _result_dict = {}
             for _entry in uid_value_pair_list:

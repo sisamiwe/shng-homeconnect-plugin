@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # vim: set encoding=utf-8 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 #########################################################################
-#  Copyright 2020-      <AUTHOR>                                  <EMAIL>
+#  Copyright 2024-      Michael Wenzel              wenzel_michael@web.de
 #########################################################################
 #  This file is part of SmartHomeNG.
 #  https://www.smarthomeNG.de
 #  https://knx-user-forum.de/forum/supportforen/smarthome-py
 #
-#  Sample plugin for new plugins to run with SmartHomeNG version 1.10
-#  and up.
+#  Plugin to connect to HomeConnect devices locally (without cloud)
 #
 #  SmartHomeNG is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -226,7 +225,7 @@ class HomeConnect(SmartPlugin):
             # print(f"_on_message: \n{json.dumps(msg, sort_keys=True, indent=4)}\n")
             self.logger.debug(f"_on_message: {msg}")
 
-            if msg and not 'error' in msg:
+            if msg and 'error' not in msg:
                 # handle device data
                 if 'deviceID' in msg:
                     msg_key = DEVICE_INFO
@@ -266,7 +265,7 @@ class HomeConnect(SmartPlugin):
         # get relevant item list concerning dedicated device
         device_item_list = self._get_device_item_list()
 
-        # loop thru item list and get values from dict
+        # loop through item list and get values from dict
         for item in device_item_list:
             item_config = self.get_item_config(item)
             i_attr = item_config['i_attr']

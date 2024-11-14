@@ -1,4 +1,5 @@
 # Create a websocket that wraps a connection to a Bosch-Siemens Home Connect device
+
 import json
 import re
 import socket
@@ -14,7 +15,7 @@ from Crypto.Hash import HMAC, SHA256
 from Crypto.Random import get_random_bytes
 
 
-# Convience to compute an HMAC on a message
+# Convince to compute an HMAC on a message
 def hmac(key, msg):
     mac = HMAC.new(key, msg=msg, digestmod=SHA256).digest()
     return mac
