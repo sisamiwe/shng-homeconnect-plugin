@@ -59,20 +59,20 @@ item_attributes:
     hcl_status_info:
         type: str
         description:
-            de: 'Statusinformation (entspricht Key des Device_info Dictionary)'
-            en: 'status info keyword  (equals Key des Device_info Dictionary)'
+            de: 'Statusinformation (entspricht Key des status_info Dictionary)'
+            en: 'status info keyword  (equals Key des status_info Dictionary)'
 
     hcl_device_info:
         type: str
         description:
-            de: 'Geräteinformation (entspricht Key des Device_info Dictionary)'
-            en: 'device info keyword  (equals Key des Device_info Dictionary)'
+            de: 'Geräteinformation (entspricht Key des device_info Dictionary)'
+            en: 'device info keyword  (equals Key des device_info Dictionary)'
 
     hcl_interface_info:
         type: str
         description:
-            de: 'Interfaceinformation (entspricht Key des Device_info Dictionary)'
-            en: 'interface info keyword  (equals Key des Device_info Dictionary)'
+            de: 'Schnittstelleninformation (entspricht Key des interface_info Dictionary)'
+            en: 'interface info keyword  (equals Key des interface_info Dictionary)'
 
 item_structs:
     device:

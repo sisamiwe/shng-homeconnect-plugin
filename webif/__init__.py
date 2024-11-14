@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # vim: set encoding=utf-8 tabstop=4 softtabstop=4 shiftwidth=4 expandtab
 #########################################################################
-#  Copyright 2023-     <AUTHOR>                                   <EMAIL>
+#  Copyright 2024-     Michael Wenzel               wenzel_michael@web.de
 #########################################################################
 #  This file is part of SmartHomeNG.
 #  https://www.smarthomeNG.de
@@ -60,7 +60,6 @@ class WebInterface(SmartPluginWebIf):
 
         self.tplenv = self.init_template_environment()
 
-
     @cherrypy.expose
     def index(self, reload=None):
         """
@@ -72,12 +71,10 @@ class WebInterface(SmartPluginWebIf):
         """
         pagelength = self.plugin.get_parameter_value('webif_pagelength')
         tmpl = self.tplenv.get_template('index.html')
-        # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(p=self.plugin,
                            webif_pagelength=pagelength,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
-                           item_count=0)
-
+                           items=self.plugin.get_item_list(),
+                           item_count=len(self.plugin.get_item_list()))
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -98,17 +95,19 @@ class WebInterface(SmartPluginWebIf):
                 return data
             except Exception as e:
                 self.logger.error(f"get_data_html exception: {e}")
-        if dataSet is None:
-            # get the new data
-            data = {}
 
-            # data['item'] = {}
-            # for i in self.plugin.items:
-            #     data['item'][i]['value'] = self.plugin.getitemvalue(i)
-            #
-            # return it as json the the web page
-            # try:
-            #     return json.dumps(data)
-            # except Exception as e:
-            #     self.logger.error("get_data_html exception: {}".format(e))
-        return {}
+        elif dataSet == 'devices_info':
+            data = {'items': {}}
+
+            for item in self.plugin.get_item_list():
+                item_dict = {'value': item.property.value, 'last_update': item.property.last_update.strftime('%d.%m.%Y %H:%M:%S'),
+                             'last_change': item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')}
+                data['items'][item.property.path] = item_dict
+
+            try:
+                return json.dumps(data, default=str)
+            except Exception as e:
+                self.logger.error(f"get_data_html exception: {e}")
+
+        if dataSet is None:
+            return

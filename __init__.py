@@ -52,9 +52,6 @@ class HomeConnect(SmartPlugin):
     PLUGIN_VERSION = '1.0.0'
 
     # ToDo: add last_successful poll to dict
-    # ToDo: detect, wenn poll fails more then 5 times
-    # ToDo: program_progress: filter string nur int werte, string filtern
-    # ToDo: remaining_program_time: filter string nur int werte, string filtern
 
     def __init__(self, sh):
         """
@@ -79,6 +76,7 @@ class HomeConnect(SmartPlugin):
         except Exception as e:
             self.logger.warning(f"Failed to load config file {e}.")
             self._init_complete = False
+            self.deinit()
         else:
             for device in devices_config:
                 if device.get('name').lower() == self.device_name.lower():
@@ -181,9 +179,7 @@ class HomeConnect(SmartPlugin):
         """
         Default plugin parse_logic method
         """
-        if 'xxx' in logic.conf:
-            # self.function(logic['name'])
-            pass
+        pass
 
     def update_item(self, item, caller=None, source=None, dest=None):
         """
@@ -213,10 +209,8 @@ class HomeConnect(SmartPlugin):
             return
 
         if self.alive and caller != self.get_fullname():
-            # code to execute if the plugin is not stopped
-            # and only, if the item has not been changed by this plugin:
+            # code to execute if the plugin is not stopped and only, if the item has not been changed by this plugin:
             self.logger.info(f"update_item: '{item.property.path}' has been changed outside this plugin by caller '{self.callerinfo(caller, source)}'")
-
             pass
 
     def poll_device(self, debug: bool = True):
@@ -265,9 +259,6 @@ class HomeConnect(SmartPlugin):
             self.logger.debug(f"{self.device_name} ERROR: {e}")
 
         self.polling_is_busy = False
-
-
-
         self.update_item_values()
 
     def update_item_values(self):
