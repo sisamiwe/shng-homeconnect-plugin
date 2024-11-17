@@ -167,7 +167,7 @@ class HomeConnect(SmartPlugin):
 
         # create item config dict
         item_config_data_dict = {'device': device_att_value, 'i_attr': item_attr, 'i_attr_value': item_attr_value}
-        self.logger.debug(f"{item.path()} added to plugin with {item_config_data_dict=}")
+        self.logger.debug(f"{item.path()} for plugin with {item_config_data_dict=} registered.")
 
         # add item
         self.add_item(item, config_data_dict=item_config_data_dict, updating=True)

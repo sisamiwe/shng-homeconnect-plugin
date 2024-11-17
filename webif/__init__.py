@@ -94,7 +94,7 @@ class WebInterface(SmartPluginWebIf):
                 data = json.dumps(data)
                 return data
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f"get_data_html overview exception: {e}")
 
         elif dataSet == 'devices_info':
             data = {'items': {}}
@@ -107,7 +107,7 @@ class WebInterface(SmartPluginWebIf):
             try:
                 return json.dumps(data, default=str)
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f"get_data_html devices_info exception: {e}")
 
         if dataSet is None:
             return
