@@ -46,8 +46,8 @@ parameters:
         type: int
         default: 60
         description:
-            de: 'Zykluszeit für Geräteabfrage'
-            en: 'Cycle time for device polling'
+            de: 'Zykluszeit für Geräteabfrage; bei 0 wird kontinuierlich auf das Gerät gehört, bei jedem anderem Wert wird das Gerät entsprechend abgefrafgt'
+            en: 'Cycle time for device polling; at cycle 0 it will be listen continuously, at any other value, the device status will be polled.'
 
 item_attributes:
     hcl_device:
@@ -359,7 +359,7 @@ item_structs:
             hcl_status_info: common.status.program.all.count.started
 
         program_run_detail:
-            type: num
+            type: str
             hcl_device: ..:.
             hcl_status_info: common.status.programrundetail.endtrigger
 

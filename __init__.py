@@ -50,8 +50,6 @@ class HomeConnect(SmartPlugin):
 
     PLUGIN_VERSION = '1.0.0'
 
-    # ToDo: add last_successful poll to dict
-
     def __init__(self, sh):
         """
         Initializes the plugin.
@@ -95,7 +93,12 @@ class HomeConnect(SmartPlugin):
         """
         self.logger.info(self.translate("Methode '{method}' aufgerufen", {'method': 'run()'}))
 
-        self.scheduler_add(f'{self.get_fullname()}_poll', self.poll_device, cycle=self.cycle)
+        if self.cycle == 0:
+            self.logger.info(f"Plugin will listen to messages pushed by {self.device_name}")
+            self.connect_device()
+        else:
+            self.logger.info(f"Plugin will poll messages from {self.device_name} every {self.cycle}s.")
+            self.scheduler_add(self.get_fullname() + '_poll', self.poll_device, cycle=self.cycle)
 
         self.alive = True
 
@@ -108,7 +111,7 @@ class HomeConnect(SmartPlugin):
         """
 
         self.logger.info(self.translate("Methode '{method}' aufgerufen", {'method': 'stop()'}))
-        self.alive = False     # if using asyncio, do not set self.alive here. Set it in the session coroutine
+        self.alive = False
 
         if self._pause_item:
             self._pause_item(True, self.get_fullname())
@@ -212,53 +215,71 @@ class HomeConnect(SmartPlugin):
             self.logger.info(f"update_item: '{item.property.path}' has been changed outside this plugin by caller '{self.callerinfo(caller, source)}'")
             pass
 
-    def poll_device(self, debug: bool = True):
+    def connect_device(self, debug: bool = True):
 
-        if self.polling_is_busy:
-            self.logger.warning(f"Another polling cycle of {self.device_name} still running")
-            return
-
-        self.polling_is_busy = True
-        self.logger.debug(f"poll_device: {self.device_name}")
-
-        def _on_message(msg):
-            # print(f"_on_message: \n{json.dumps(msg, sort_keys=True, indent=4)}\n")
-            self.logger.debug(f"_on_message: {msg}")
-
-            if msg and 'error' not in msg:
-                # handle device data
-                if 'deviceID' in msg:
-                    msg_key = DEVICE_INFO
-
-                # handle network interface data
-                elif 'interfaceID' in msg:
-                    msg_key = INTERFACE_INFO
-
-                # handle status data
-                else:
-                    msg_key = STATUS_INFO
-
-                if msg_key not in self.device:
-                    self.device[msg_key] = {}
-
-                _merge_dicts(self.device[msg_key], _lower_dict_keys(msg))
-
-        def _on_open(ws):
-            self.logger.info(f"{self.device_name} websocket opened...")
-
-        def _on_close(ws, code, message):
-            self.logger.info(f"{self.device_name} websocket closed. Next poll in {self.cycle}s.")
+        self.logger.debug(f"Connect to: {self.device_name} and listen continuously.")
 
         try:
             self.logger.debug(f"{self.device_name} connecting to {self.device_host}")
             ws = HCSocket(self.device_host, self.device_config["key"], self.device_config.get("iv", None), debug=debug, logger=self.logger)
-            dev = HCDevice(ws, self.device_config, debug=debug, logger=self.logger)
-            dev.run_forever(on_message=_on_message, on_open=_on_open, on_close=_on_close)
+            device = HCDevice(ws, self.device_config, debug=debug, logger=self.logger)
+            device.run_forever(on_message=self._on_message, on_open=self._on_open, on_close=self._on_close)
+        except Exception as e:
+            self.logger.debug(f"{self.device_name} ERROR: {e}")
+
+    def _on_message(self, msg):
+        # print(f"_on_message: \n{json.dumps(msg, sort_keys=True, indent=4)}\n")
+        self.logger.debug(f"_on_message: {msg}")
+
+        if msg and 'error' not in msg:
+            # handle device data
+            if 'deviceID' in msg:
+                msg_key = DEVICE_INFO
+
+            # handle network interface data
+            elif 'interfaceID' in msg:
+                msg_key = INTERFACE_INFO
+
+            # handle status data
+            else:
+                msg_key = STATUS_INFO
+
+            if msg_key not in self.device:
+                self.device[msg_key] = {}
+
+            _merge_dicts(self.device[msg_key], _lower_dict_keys(msg))
+            self.update_item_values()
+
+    def _on_open(self, ws):
+        self.logger.info(f"{self.device_name} websocket opened...")
+
+    def _on_close(self, ws, code, message):
+        self.logger.info(f"{self.device_name} websocket closed. Try to reconnect.")
+
+    def poll_device(self, debug: bool = True):
+
+        if self.polling_is_busy:
+            self.logger.warning(f"Another polling cycle of {self.device_name} still running. This poll will be skipped.")
+            return
+
+        self.polling_is_busy = True
+        self.logger.debug(f"Connect to: {self.device_name} and poll status.")
+
+        try:
+            self.logger.debug(f"{self.device_name} connecting to {self.device_host}")
+            ws = HCSocket(self.device_host, self.device_config["key"], self.device_config.get("iv", None), debug=debug, logger=self.logger)
+            device = HCDevice(ws, self.device_config, debug=debug, logger=self.logger)
+
+            ws.debug = debug
+            ws.reconnect()
+
+            while True:
+                self._on_message(device.recv())
+
         except Exception as e:
             self.logger.debug(f"{self.device_name} ERROR: {e}")
 
         self.polling_is_busy = False
-        self.update_item_values()
 
     def update_item_values(self):
 
@@ -280,6 +301,7 @@ class HomeConnect(SmartPlugin):
         return self.get_item_list(filter_key='device', filter_value=self.device_name)
 
     def _get_value_from_device_dict(self, i_attr, i_attr_value):
+        """ get value from device dict and modify diverse values"""
 
         value = self.device.get(i_attr, {})
         path_list = i_attr_value.split('.')

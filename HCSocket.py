@@ -126,7 +126,6 @@ class HCSocket:
         return enc_msg + self.last_tx_hmac
 
     def reconnect(self):
-        self.logger.warning(f"reconnect websocket")
         self.reset()
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect((self.host, self.port))
@@ -205,6 +204,7 @@ class HCSocket:
 
         if self.debug:
             self.logger.debug("HCSocket CON:", self.uri)
+
         self.ws = websocket.WebSocketApp(
             self.uri,
             socket=sock,

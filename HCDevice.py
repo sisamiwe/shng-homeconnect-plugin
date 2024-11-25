@@ -472,7 +472,7 @@ class HCDevice:
         msg = json.loads(buf)
         if self.debug:
             self.logger.debug(f"HCDevice {self.name} RX: {msg=}")
-        # sys.stdout.flush()
+        sys.stdout.flush()
 
         resource = msg["resource"]
         action = msg["action"]
@@ -604,8 +604,8 @@ class HCDevice:
                 self.logger.debug(f"HCDevice '{self.name}' Websocket closed: {message}")
             on_close(ws, code, message)
 
-        def on_error(ws, message):
+        def _on_error(ws, message):
             if self.debug:
                 self.logger.debug(f"HCDevice '{self.name}' Websocket error: {message}")
 
-        self.ws.run_forever(on_message=_on_message, on_open=_on_open, on_close=_on_close, on_error=on_error)
+        self.ws.run_forever(on_message=_on_message, on_open=_on_open, on_close=_on_close, on_error=_on_error)
